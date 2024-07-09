@@ -1,102 +1,119 @@
 import './style.css';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set, push, onValue, remove, update } from 'firebase/database';
 
+// Konfiguracja Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCCdkwkvXZ3Asf2Rp5OivDqYOR-VRPDszk",
+  authDomain: "playground-4863b.firebaseapp.com",
+  databaseURL: "https://playground-4863b-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "playground-4863b",
+  storageBucket: "playground-4863b.appspot.com",
+  messagingSenderId: "764285963865",
+  appId: "1:764285963865:web:57d1998230a9dbda0dab48"
+};
+
+// Inicjalizacja Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Selektory
 const Add = document.querySelector("#add");
 const Input = document.querySelector("#input") as HTMLInputElement;
 
+interface Task {
+  id: string;
+  task: string;
+}
+
+// Event listeners
 Add?.addEventListener('click', addInputValueToTasks);
 
-const localStorageKey = "tasksKey";
-
-function getTasksFromLocalStorage() {
-  const storedTasksJSON = localStorage.getItem(localStorageKey);
-  return storedTasksJSON ? JSON.parse(storedTasksJSON) : [];
-}
-
-function saveTasksToLocalStorage(task: string[]) {
-  const tasksJSON = JSON.stringify(task);
-  localStorage.setItem(localStorageKey, tasksJSON);
-  showLocalStorage();
-}
-
-function addInputValueToTasks() {
-  const inputValue = Input.value;
-  if (!inputValue) {  // Sprawdza, czy wprowadzona wartość po usunięciu białych znaków jest pusta
-    alert("Error: Wartość jest pusta!");  // Wyświetla komunikat błędu
-    return;  // Kończy wykonanie funkcji, aby nie dodawać pustego taska
+function addInputValueToTasks(): void {
+  const inputValue = Input.value.trim();
+  if (!inputValue) {
+    alert("Error: Task cannot be empty!");
+    return;
   }
+  saveTaskToDatabase(inputValue);
+  Input.value = "";
+}
 
-  if (Input) {
-    const Tasks = getTasksFromLocalStorage();
-    Tasks.push(inputValue);
-    saveTasksToLocalStorage(Tasks);
-    Input.value = "";
+async function saveTaskToDatabase(task: string): Promise<void> {
+  try {
+    const newTaskRef = push(ref(db, 'tasks'));
+    await set(newTaskRef, { task });
+    console.log("Task added!");
+    getTasksFromDatabase(); // Refresh the list
+  } catch (error) {
+    console.error("Error adding task: ", error);
+    alert("Error adding task: " + (error as Error).message);
   }
 }
 
-function deleteTaskFromLocalStorage(index: number): void {
-  const tasks = getTasksFromLocalStorage();
+function getTasksFromDatabase(): void {
+  const tasksRef = ref(db, 'tasks');
+  onValue(tasksRef, (snapshot) => {
+    const tasks = [];
+    snapshot.forEach((childSnapshot) => {
+      tasks.push({ id: childSnapshot.key, ...childSnapshot.val() });
+    });
+    renderTasks(tasks);
+  });
+}
 
-  // Wyświetl dialog potwierdzający z opcją OK i Cancel
-  const confirmDeletion = confirm("Czy na pewno chcesz usunąć to zadanie?");
-
-  // Kontynuuj tylko, jeśli użytkownik kliknie OK
+async function deleteTaskFromDatabase(id: string): Promise<void> {
+  const confirmDeletion = confirm("Are you sure you want to delete this task?");
   if (confirmDeletion) {
-    if (index >= 0 && index < tasks.length) {
-      tasks.splice(index, 1); // Usuń wartość na podanym indeksie z tablicy
-      saveTasksToLocalStorage(tasks); // Zapisz zaktualizowaną tablicę do localStorage
-      console.log(`Usunięto wartość z tablicy zadań na indeksie ${index}.`);
-    } else {
-      console.error("Nieprawidłowy indeks.");
-      alert("Błąd: Podano nieprawidłowy indeks.");  // Opcjonalne: Informacja o błędzie, jeśli indeks jest poza zakresem
+    try {
+      await remove(ref(db, `tasks/${id}`));
+      console.log("Task deleted!");
+      getTasksFromDatabase(); // Refresh the list
+    } catch (error) {
+      console.error("Error deleting task: ", error);
+      alert("Error deleting task: " + (error as Error).message);
     }
-  } else {
-    console.log("Usunięcie zadania anulowane.");
-  }
-
-  showLocalStorage();
-}
-
-function editTask(index: number) {
-  const tasks = getTasksFromLocalStorage();
-  const newTaskValue = prompt("Wprowadź nową wartość zadania:", tasks[index]);
-
-  if (newTaskValue !== null) {
-    tasks[index] = newTaskValue;
-    saveTasksToLocalStorage(tasks);
   }
 }
 
-function showLocalStorage() {
+async function editTask(id: string, task: string): Promise<void> {
+  const newTaskValue = prompt("Enter new task value:", task);
+  if (newTaskValue !== null && newTaskValue.trim() !== '') {
+    try {
+      await update(ref(db, `tasks/${id}`), { task: newTaskValue.trim() });
+      console.log("Task updated!");
+      getTasksFromDatabase();
+    } catch (error) {
+      console.error("Error updating task: ", error);
+      alert("Error updating task: " + (error as Error).message);
+    }
+  }
+}
+
+function renderTasks(tasks: Task[]): void {
   const olElement = document.querySelector("#task-list");
-
   if (olElement) {
     while (olElement.firstChild) {
       olElement.removeChild(olElement.firstChild);
     }
-  } else {
-    console.error("Nie znaleziono elementu <ol>.");
-  }
-  const tasks = getTasksFromLocalStorage();
-  for (let i = 0; i < tasks.length; i++) {
-    const taskList = document.createElement("li");
-    const taskEditButton = document.createElement("button");
-    const taskDeleteButton = document.createElement("button");
+    tasks.forEach((taskObj) => {
+      const taskList = document.createElement("li");
+      const taskEditButton = document.createElement("button");
+      const taskDeleteButton = document.createElement("button");
 
-    taskList.innerText = tasks[i];
-    taskEditButton.innerText = "Edit";
-    taskEditButton.id = `edit-button-${i}`;
-    taskDeleteButton.innerText = "Delete";
-    taskDeleteButton.id = `delete-button-${i}`;
+      taskList.innerText = taskObj.task;
+      taskEditButton.innerText = "Edit";
+      taskDeleteButton.innerText = "Delete";
 
-    taskEditButton.addEventListener('click', () => editTask(i));
-    taskDeleteButton.addEventListener('click', () => deleteTaskFromLocalStorage(i));
+      taskEditButton.addEventListener('click', () => editTask(taskObj.id, taskObj.task));
+      taskDeleteButton.addEventListener('click', () => deleteTaskFromDatabase(taskObj.id));
 
-    taskList.appendChild(taskEditButton);
-    taskList.appendChild(taskDeleteButton);
-    olElement.appendChild(taskList);
+      taskList.appendChild(taskEditButton);
+      taskList.appendChild(taskDeleteButton);
+      olElement.appendChild(taskList);
+    });
   }
 }
 
-showLocalStorage();
-
-//jakaś zmiana
+// Początkowe ładowanie zadań
+getTasksFromDatabase();
