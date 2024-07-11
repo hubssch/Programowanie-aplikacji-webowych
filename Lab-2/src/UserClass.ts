@@ -1,5 +1,5 @@
-// UserClass.ts
-export class UserClass {
+// User.ts
+export class User {
     id: number;
     firstName: string;
     lastName: string;
@@ -12,17 +12,17 @@ export class UserClass {
 }
 
 export class UserManager {
-    private currentUser: UserClass | null = null;
+    private currentUser: User | null = null;
 
-    setCurrentUser(user: UserClass) {
+    setCurrentUser(user: User) {
         this.currentUser = user;
     }
 
-    getCurrentUser(): UserClass | null {
+    getCurrentUser(): User | null {
         return this.currentUser;
     }
 
     mockLogin() {
-        this.currentUser = new UserClass(1, "John", "Doe");
+        this.currentUser = new User(1, "John", "Doe");
     }
 }

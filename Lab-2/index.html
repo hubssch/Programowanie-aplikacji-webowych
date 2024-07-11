@@ -7,17 +7,42 @@
     <title>Vite + TS</title>
   </head>
   <body>
-    <div id="app">
-      <div id="read">
-        <ol id="task-list">
-
-      </ol>
-    </div>
-      
-      <div id="create">
-        <input type="text" placeholder="Task" id="input" name="input">
-        <button id="add">Add Task</button>
+    <section id="logged-in-view">
+      <nav>
+        <button id="sign-out-btn" class="icon-btn">
+            <img src="assets/pngwing.com.png" class="icon-img-btn">
+        </button>
+      </nav>
+      <div id="app">
+        <div id="read">
+          <ol id="project-list"></ol>
+        </div>
+        <div id="create">
+          <input type="text" placeholder="Project Name" id="input-name" name="input-name">
+          <input type="text" placeholder="Project Description" id="input-description" name="input-description">
+          <button id="add">Add Project</button>
+        </div>
       </div>
+    </section>
+
+    <section id="logged-out-view">
+      <div class="container">
+        <h1 class="app-title">Project Manager</h1>
+        <div class="provider-buttons">
+            <button id="sign-in-with-google-btn" class="provider-btn">
+                <img src="assets/google.png" class="google-btn-logo">
+                Sign in with Google
+            </button>
+        </div>
+        <div class="auth-fields-and-buttons">
+            <input id="email-input" type="email" placeholder="Email">
+            <input id="password-input" type="password" placeholder="Password">
+            <button id="sign-in-btn" class="primary-btn">Sign in</button>
+            <button id="create-account-btn" class="secondary-btn">Create Account</button>
+        </div>
+      </div>
+    </section>
+    
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
