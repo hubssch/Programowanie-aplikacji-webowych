@@ -75,14 +75,38 @@ class TaskManager {
         }
     }
 
-    public async editTask(id: string, updates: Partial<Task>): Promise<void> {
-        try {
-            await update(ref(db, `projects/${this.currentStoryId}/tasks/${id}`), updates);
-            console.log("Task updated!");
-            this.getTasks();
-        } catch (error) {
-            console.error("Error updating task: ", error);
-            alert("Error updating task: " + (error as Error).message);
+    public async editTask(id: string, name: string, description: string, priority: 'low' | 'medium' | 'high', estimatedTime: number, status: 'todo' | 'doing' | 'done'): Promise<void> {
+        const newName = prompt("Enter new task name:", name);
+        const newDescription = prompt("Enter new task description:", description);
+        const newPriority = prompt("Enter new task priority (low, medium, high):", priority);
+        const newEstimatedTime = prompt("Enter new task estimated time (hours):", estimatedTime.toString());
+        const newStatus = prompt("Enter new task status (todo, doing, done):", status);
+        const updates: Partial<Task> = {};
+
+        if (newName !== null && newDescription !== null && newPriority !== null && newEstimatedTime !== null && newStatus !== null && newName.trim() !== '' && newDescription.trim() !== '' && newPriority.trim() !== '' && newEstimatedTime.trim() !== '' && newStatus.trim() !== '') {
+            updates.name = newName.trim();
+            updates.description = newDescription.trim();
+            updates.priority = newPriority.trim() as 'low' | 'medium' | 'high';
+            updates.estimatedTime = parseInt(newEstimatedTime.trim());
+            updates.status = newStatus.trim() as 'todo' | 'doing' | 'done';
+
+            // Add additional fields based on status
+            if (updates.status === 'doing') {
+                updates.startDate = new Date().toISOString();
+                updates.ownerId = prompt("Enter owner ID:");
+            } else if (updates.status === 'done') {
+                updates.endDate = new Date().toISOString();
+                updates.ownerId = prompt("Enter owner ID:");
+            }
+
+            try {
+                await update(ref(db, `projects/${this.currentStoryId}/tasks/${id}`), updates);
+                console.log("Task updated!");
+                this.getTasks();
+            } catch (error) {
+                console.error("Error updating task: ", error);
+                alert("Error updating task: " + (error as Error).message);
+            }
         }
     }
 
@@ -121,7 +145,7 @@ class TaskManager {
                 });
                 taskEditButton.addEventListener('click', (event) => {
                     event.stopPropagation();
-                    this.editTask(task.id, { name: task.name, description: task.description, priority: task.priority });
+                    this.editTask(task.id, task.name, task.description, task.priority, task.estimatedTime, task.status);
                 });
                 taskDeleteButton.addEventListener('click', (event) => {
                     event.stopPropagation();

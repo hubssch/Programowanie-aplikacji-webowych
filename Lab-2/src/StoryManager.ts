@@ -77,15 +77,23 @@ class StoryManager {
         }
     }
 
-    public async editStory(id: string, updates: Partial<Story>): Promise<void> {
-        if (!this.currentProjectId) return;
-        try {
-            await update(ref(db, `projects/${this.currentProjectId}/stories/${id}`), updates);
-            console.log("Story updated!");
-            this.getStories();
-        } catch (error) {
-            console.error("Error updating story: ", error);
-            alert("Error updating story: " + (error as Error).message);
+    public async editStory(id: string, name: string, description: string, priority: 'low' | 'medium' | 'high'): Promise<void> {
+        const newName = prompt("Enter new story name:", name);
+        const newDescription = prompt("Enter new story description:", description);
+        const newPriority = prompt("Enter new story priority (low, medium, high):", priority);
+        if (newName !== null && newDescription !== null && newPriority !== null && newName.trim() !== '' && newDescription.trim() !== '' && newPriority.trim() !== '') {
+            try {
+                await update(ref(db, `projects/${this.currentProjectId}/stories/${id}`), {
+                    name: newName.trim(),
+                    description: newDescription.trim(),
+                    priority: newPriority.trim() as 'low' | 'medium' | 'high'
+                });
+                console.log("Story updated!");
+                this.getStories();
+            } catch (error) {
+                console.error("Error updating story: ", error);
+                alert("Error updating story: " + (error as Error).message);
+            }
         }
     }
 
@@ -121,7 +129,7 @@ class StoryManager {
                 });
                 storyEditButton.addEventListener('click', (event) => {
                     event.stopPropagation();
-                    this.editStory(story.id, { name: story.name, description: story.description, priority: story.priority });
+                    this.editStory(story.id, story.name, story.description, story.priority);
                 });
                 storyDeleteButton.addEventListener('click', (event) => {
                     event.stopPropagation();
