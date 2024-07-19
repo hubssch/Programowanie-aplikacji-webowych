@@ -1,5 +1,6 @@
 import { db } from './firebaseConfig';
 import { ref, set, push, onValue, remove, update } from 'firebase/database';
+import TaskManager from './TaskManager';
 
 interface Story {
     id: string;
@@ -11,24 +12,26 @@ interface Story {
 class StoryManager {
     private storyListElement: HTMLElement | null;
     private currentProjectId: string | null;
+    public taskManager: TaskManager;
 
     constructor() {
         this.storyListElement = document.querySelector("#story-list");
         this.currentProjectId = null;
+        this.taskManager = new TaskManager();
     }
 
     public setProjectId(projectId: string): void {
         this.currentProjectId = projectId;
-        console.log("Ustawiono bieżące ID projektu na: ", this.currentProjectId); //legancko
+        console.log("Ustawiono bieżące ID projektu na: ", this.currentProjectId);
     }
 
     public showProjectId() {
-        console.log("Aktualny Projekt" + " " + this.currentProjectId) //null
+        console.log("Aktualny Projekt ID: ", this.currentProjectId);
     }
 
     public async addStory(name: string, description: string, priority: 'low' | 'medium' | 'high'): Promise<void> {
-        console.log("Próba dodania historii do projektu o ID: ", this.currentProjectId); //null
-        this.showProjectId()
+        console.log("Próba dodania historii do projektu o ID: ", this.currentProjectId);
+        this.showProjectId();
         if (!this.currentProjectId) {
             alert("Error: Project ID is not set.");
             return;
@@ -114,12 +117,11 @@ class StoryManager {
                 storyDeleteButton.innerText = "Delete";
 
                 storyInfo.addEventListener('click', () => {
-                    // Call the function to show the story details view
+                    this.showTaskView(story.id, story.name);
                 });
                 storyEditButton.addEventListener('click', (event) => {
                     event.stopPropagation();
                     this.editStory(story.id, { name: story.name, description: story.description, priority: story.priority });
-                    console.log("Story edit")
                 });
                 storyDeleteButton.addEventListener('click', (event) => {
                     event.stopPropagation();
@@ -136,6 +138,21 @@ class StoryManager {
                 storyListItem.appendChild(buttonsDiv);
                 this.storyListElement?.appendChild(storyListItem);
             });
+        }
+    }
+
+    private showTaskView(storyId: string, storyName: string): void {
+        const taskView = document.getElementById("task-view");
+        const projectView = document.getElementById("project-view");
+        const taskTitle = document.getElementById("task-title");
+
+        if (taskView && projectView && taskTitle) {
+            projectView.style.display = "none";
+            taskView.style.display = "block";
+            taskTitle.innerText = `Story: ${storyName}`;
+            console.log("Setting story ID to: ", storyId);
+            this.taskManager.setStoryId(storyId);
+            this.taskManager.getTasks();
         }
     }
 }

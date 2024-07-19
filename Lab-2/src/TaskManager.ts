@@ -100,16 +100,19 @@ class TaskManager {
                 const taskName = document.createElement("div");
                 const taskDescription = document.createElement("div");
                 const taskPriority = document.createElement("div");
+                const taskStatus = document.createElement("div");
                 const taskEditButton = document.createElement("button");
                 const taskDeleteButton = document.createElement("button");
 
                 taskName.classList.add("task-name");
                 taskDescription.classList.add("task-description");
                 taskPriority.classList.add("task-priority");
+                taskStatus.classList.add("task-status");
 
                 taskName.innerText = task.name;
                 taskDescription.innerText = task.description;
                 taskPriority.innerText = `Priority: ${task.priority}`;
+                taskStatus.innerText = `Status: ${task.status}`;
                 taskEditButton.innerText = "Edit";
                 taskDeleteButton.innerText = "Delete";
 
@@ -128,6 +131,7 @@ class TaskManager {
                 taskInfo.appendChild(taskName);
                 taskInfo.appendChild(taskDescription);
                 taskInfo.appendChild(taskPriority);
+                taskInfo.appendChild(taskStatus);
                 buttonsDiv.appendChild(taskEditButton);
                 buttonsDiv.appendChild(taskDeleteButton);
 

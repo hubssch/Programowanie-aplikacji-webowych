@@ -31,6 +31,7 @@ const emailInput = document.querySelector("#email-input") as HTMLInputElement;
 const passwordInput = document.querySelector("#password-input") as HTMLInputElement;
 const signOutButton = document.querySelector("#sign-out-btn");
 const backToProjectsButton = document.querySelector("#back-to-projects-btn");
+const backToStoriesButton = document.querySelector("#back-to-stories-btn");
 
 // Event listeners
 addProjectButton?.addEventListener('click', () => {
@@ -45,20 +46,6 @@ addProjectButton?.addEventListener('click', () => {
   inputProjectDescription.value = '';
 });
 
-// addStoryButton?.addEventListener('click', () => {
-//   const name = inputStoryName.value.trim();
-//   const description = inputStoryDescription.value.trim();
-//   const priority = inputStoryPriority.value as 'low' | 'medium' | 'high';
-//   if (!name || !description) {
-//     alert("Error: Name and description cannot be empty!");
-//     return;
-//   }
-//   storyManager.addStory(name, description, priority);
-//   inputStoryName.value = '';
-//   inputStoryDescription.value = '';
-//   console.log("Add Story")
-// });
-
 addStoryButton?.addEventListener('click', () => {
   const name = inputStoryName.value.trim();
   const description = inputStoryDescription.value.trim();
@@ -68,14 +55,26 @@ addStoryButton?.addEventListener('click', () => {
     return;
   }
   console.log("Dodawanie historii: ", { name, description, priority });
-  // storyManager.addStory(name, description, priority);
   projectManager.storyManager.addStory(name, description, priority);
   inputStoryName.value = '';
   inputStoryDescription.value = '';
 });
 
-
-
+addTaskButton?.addEventListener('click', () => {
+  const name = inputTaskName.value.trim();
+  const description = inputTaskDescription.value.trim();
+  const priority = inputTaskPriority.value as 'low' | 'medium' | 'high';
+  const estimatedTime = parseInt(inputTaskTime.value.trim());
+  if (!name || !description || isNaN(estimatedTime)) {
+    alert("Error: Name, description, and estimated time cannot be empty!");
+    return;
+  }
+  console.log("Dodawanie zadania: ", { name, description, priority, estimatedTime });
+  projectManager.storyManager.taskManager.addTask(name, description, priority, estimatedTime);
+  inputTaskName.value = '';
+  inputTaskDescription.value = '';
+  inputTaskTime.value = '';
+});
 
 // Logowanie
 signInButton?.addEventListener('click', () => {
@@ -124,6 +123,15 @@ backToProjectsButton?.addEventListener('click', () => {
   if (projectView && loggedInView) {
     projectView.style.display = "none";
     loggedInView.style.display = "block";
+  }
+});
+
+backToStoriesButton?.addEventListener('click', () => {
+  const taskView = document.getElementById("task-view");
+  const projectView = document.getElementById("project-view");
+  if (taskView && projectView) {
+    taskView.style.display = "none";
+    projectView.style.display = "block";
   }
 });
 
