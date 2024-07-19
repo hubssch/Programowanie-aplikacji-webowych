@@ -84,6 +84,15 @@ h1 {
   padding-right: 1em;
 }
 
+#project-list li .project-name {
+  font-weight: bold;
+  margin-bottom: 0.2em;
+}
+
+#project-list li .project-description {
+  margin-bottom: 0.5em;
+}
+
 #project-list li .buttons {
   display: flex;
   flex-direction: column;

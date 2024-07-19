@@ -54,7 +54,7 @@ signOutButtonEl.addEventListener("click", authSignOut)
 
 // Functions
 
-showLoggedInView()
+showLoggedOutView()
 
 function authSignInWithGoogle() {
   console.log("Sign in with Google")
@@ -176,16 +176,24 @@ function renderProjects(projects: Project[]): void {
       projectInfo.classList.add("project-info");
       buttonsDiv.classList.add("buttons");
 
+      const projectName = document.createElement("div");
+      const projectDescription = document.createElement("div");
       const projectEditButton = document.createElement("button");
       const projectDeleteButton = document.createElement("button");
 
-      projectInfo.innerText = `${projectObj.name}: ${projectObj.description}`;
+      projectName.classList.add("project-name");
+      projectDescription.classList.add("project-description");
+
+      projectName.innerText = projectObj.name;
+      projectDescription.innerText = projectObj.description;
       projectEditButton.innerText = "Edit";
       projectDeleteButton.innerText = "Delete";
 
       projectEditButton.addEventListener('click', () => editProject(projectObj.id, projectObj.name, projectObj.description));
       projectDeleteButton.addEventListener('click', () => deleteProjectFromDatabase(projectObj.id));
 
+      projectInfo.appendChild(projectName);
+      projectInfo.appendChild(projectDescription);
       buttonsDiv.appendChild(projectEditButton);
       buttonsDiv.appendChild(projectDeleteButton);
 
@@ -195,6 +203,7 @@ function renderProjects(projects: Project[]): void {
     });
   }
 }
+
 
 
 function showLoggedOutView() {
