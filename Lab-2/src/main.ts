@@ -45,6 +45,20 @@ addProjectButton?.addEventListener('click', () => {
   inputProjectDescription.value = '';
 });
 
+// addStoryButton?.addEventListener('click', () => {
+//   const name = inputStoryName.value.trim();
+//   const description = inputStoryDescription.value.trim();
+//   const priority = inputStoryPriority.value as 'low' | 'medium' | 'high';
+//   if (!name || !description) {
+//     alert("Error: Name and description cannot be empty!");
+//     return;
+//   }
+//   storyManager.addStory(name, description, priority);
+//   inputStoryName.value = '';
+//   inputStoryDescription.value = '';
+//   console.log("Add Story")
+// });
+
 addStoryButton?.addEventListener('click', () => {
   const name = inputStoryName.value.trim();
   const description = inputStoryDescription.value.trim();
@@ -53,25 +67,15 @@ addStoryButton?.addEventListener('click', () => {
     alert("Error: Name and description cannot be empty!");
     return;
   }
-  storyManager.addStory(name, description, priority);
+  console.log("Dodawanie historii: ", { name, description, priority });
+  // storyManager.addStory(name, description, priority);
+  projectManager.storyManager.addStory(name, description, priority);
   inputStoryName.value = '';
   inputStoryDescription.value = '';
 });
 
-addTaskButton?.addEventListener('click', () => {
-  const name = inputTaskName.value.trim();
-  const description = inputTaskDescription.value.trim();
-  const priority = inputTaskPriority.value as 'low' | 'medium' | 'high';
-  const estimatedTime = parseFloat(inputTaskTime.value);
-  if (!name || !description || isNaN(estimatedTime)) {
-    alert("Error: Name, description, and estimated time cannot be empty!");
-    return;
-  }
-  taskManager.addTask(name, description, priority, estimatedTime);
-  inputTaskName.value = '';
-  inputTaskDescription.value = '';
-  inputTaskTime.value = '';
-});
+
+
 
 // Logowanie
 signInButton?.addEventListener('click', () => {
@@ -115,8 +119,6 @@ signOutButton?.addEventListener('click', () => {
     });
 });
 
-
-
 backToProjectsButton?.addEventListener('click', () => {
   const projectView = document.getElementById("project-view");
   if (projectView && loggedInView) {
@@ -124,7 +126,6 @@ backToProjectsButton?.addEventListener('click', () => {
     loggedInView.style.display = "block";
   }
 });
-
 
 // Funkcja do wyczyszczenia pól logowania
 function clearAuthFields() {

@@ -14,7 +14,8 @@ class ProjectManager {
 
     constructor() {
         this.projectListElement = document.querySelector("#project-list");
-        this.storyManager = new StoryManager();
+        this.storyManager = new StoryManager();  // Upewnij się, że ta instancja jest właściwa
+        console.log("ProjectManager konstruktor, storyManager: ", this.storyManager);
     }
 
     public async addProject(name: string, description: string): Promise<void> {
@@ -126,10 +127,14 @@ class ProjectManager {
             loggedInView.style.display = "none";
             projectView.style.display = "block";
             projectTitle.innerText = `Project: ${projectName}`;
+            console.log("Ustawiam ID projektu na: ", projectId);
             this.storyManager.setProjectId(projectId);
+            this.storyManager.showProjectId();  // Dodaj to logowanie, aby sprawdzić, czy ID jest ustawiane poprawnie
             this.storyManager.getStories();
         }
     }
+
+
 }
 
 export default ProjectManager;

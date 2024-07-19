@@ -6,10 +6,6 @@ interface Story {
     name: string;
     description: string;
     priority: 'low' | 'medium' | 'high';
-    projectId: string;
-    createdDate: string;
-    status: 'todo' | 'doing' | 'done';
-    ownerId: string;
 }
 
 class StoryManager {
@@ -23,49 +19,52 @@ class StoryManager {
 
     public setProjectId(projectId: string): void {
         this.currentProjectId = projectId;
+        console.log("Ustawiono bieżące ID projektu na: ", this.currentProjectId); //legancko
+    }
+
+    public showProjectId() {
+        console.log("Aktualny Projekt" + " " + this.currentProjectId) //null
     }
 
     public async addStory(name: string, description: string, priority: 'low' | 'medium' | 'high'): Promise<void> {
-        if (!this.currentProjectId) return;
+        console.log("Próba dodania historii do projektu o ID: ", this.currentProjectId); //null
+        this.showProjectId()
+        if (!this.currentProjectId) {
+            alert("Error: Project ID is not set.");
+            return;
+        }
         try {
-            const newStoryRef = push(ref(db, 'stories'));
+            const newStoryRef = push(ref(db, `projects/${this.currentProjectId}/stories`));
             await set(newStoryRef, {
                 name,
                 description,
                 priority,
-                projectId: this.currentProjectId,
-                createdDate: new Date().toISOString(),
-                status: 'todo',
-                ownerId: '', // Set the actual owner ID
             });
-            console.log("Story added!");
             this.getStories();
         } catch (error) {
-            console.error("Error adding story: ", error);
-            alert("Error adding story: " + (error as Error).message);
+            console.error("Błąd podczas dodawania historii: ", error);
+            alert("Błąd podczas dodawania historii: " + (error as Error).message);
         }
     }
 
     public getStories(): void {
         if (!this.currentProjectId) return;
-        const storiesRef = ref(db, 'stories');
+        const storiesRef = ref(db, `projects/${this.currentProjectId}/stories`);
         onValue(storiesRef, (snapshot) => {
             const stories: Story[] = [];
             snapshot.forEach((childSnapshot) => {
-                const story = childSnapshot.val();
-                if (story.projectId === this.currentProjectId) {
-                    stories.push({ id: childSnapshot.key!, ...story });
-                }
+                stories.push({ id: childSnapshot.key!, ...childSnapshot.val() });
             });
             this.renderStories(stories);
         });
     }
 
     public async deleteStory(id: string): Promise<void> {
+        if (!this.currentProjectId) return;
         const confirmDeletion = confirm("Are you sure you want to delete this story?");
         if (confirmDeletion) {
             try {
-                await remove(ref(db, `stories/${id}`));
+                await remove(ref(db, `projects/${this.currentProjectId}/stories/${id}`));
                 console.log("Story deleted!");
                 this.getStories();
             } catch (error) {
@@ -76,8 +75,9 @@ class StoryManager {
     }
 
     public async editStory(id: string, updates: Partial<Story>): Promise<void> {
+        if (!this.currentProjectId) return;
         try {
-            await update(ref(db, `stories/${id}`), updates);
+            await update(ref(db, `projects/${this.currentProjectId}/stories/${id}`), updates);
             console.log("Story updated!");
             this.getStories();
         } catch (error) {
@@ -119,6 +119,7 @@ class StoryManager {
                 storyEditButton.addEventListener('click', (event) => {
                     event.stopPropagation();
                     this.editStory(story.id, { name: story.name, description: story.description, priority: story.priority });
+                    console.log("Story edit")
                 });
                 storyDeleteButton.addEventListener('click', (event) => {
                     event.stopPropagation();

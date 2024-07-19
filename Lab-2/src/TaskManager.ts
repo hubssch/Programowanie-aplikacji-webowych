@@ -31,7 +31,7 @@ class TaskManager {
     public async addTask(name: string, description: string, priority: 'low' | 'medium' | 'high', estimatedTime: number): Promise<void> {
         if (!this.currentStoryId) return;
         try {
-            const newTaskRef = push(ref(db, 'tasks'));
+            const newTaskRef = push(ref(db, `projects/${this.currentStoryId}/tasks`));
             await set(newTaskRef, {
                 name,
                 description,
@@ -51,14 +51,11 @@ class TaskManager {
 
     public getTasks(): void {
         if (!this.currentStoryId) return;
-        const tasksRef = ref(db, 'tasks');
+        const tasksRef = ref(db, `projects/${this.currentStoryId}/tasks`);
         onValue(tasksRef, (snapshot) => {
             const tasks: Task[] = [];
             snapshot.forEach((childSnapshot) => {
-                const task = childSnapshot.val();
-                if (task.storyId === this.currentStoryId) {
-                    tasks.push({ id: childSnapshot.key!, ...task });
-                }
+                tasks.push({ id: childSnapshot.key!, ...childSnapshot.val() });
             });
             this.renderTasks(tasks);
         });
@@ -68,7 +65,7 @@ class TaskManager {
         const confirmDeletion = confirm("Are you sure you want to delete this task?");
         if (confirmDeletion) {
             try {
-                await remove(ref(db, `tasks/${id}`));
+                await remove(ref(db, `projects/${this.currentStoryId}/tasks/${id}`));
                 console.log("Task deleted!");
                 this.getTasks();
             } catch (error) {
@@ -80,7 +77,7 @@ class TaskManager {
 
     public async editTask(id: string, updates: Partial<Task>): Promise<void> {
         try {
-            await update(ref(db, `tasks/${id}`), updates);
+            await update(ref(db, `projects/${this.currentStoryId}/tasks/${id}`), updates);
             console.log("Task updated!");
             this.getTasks();
         } catch (error) {
