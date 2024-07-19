@@ -62,13 +62,17 @@ h1 {
   width: 100%;
 }
 
-#project-list {
+#project-list,
+#story-list,
+#task-list {
   list-style-type: none;
   padding: 0;
   width: 100%;
 }
 
-#project-list li {
+#project-list li,
+#story-list li,
+#task-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -79,21 +83,29 @@ h1 {
   border-radius: var(--element-border-radius);
 }
 
-#project-list li .project-info {
+#project-list li .project-info,
+#story-list li .story-info,
+#task-list li .task-info {
   flex-grow: 1;
   padding-right: 1em;
 }
 
-#project-list li .project-name {
+#project-list li .project-name,
+#story-list li .story-name,
+#task-list li .task-name {
   font-weight: bold;
   margin-bottom: 0.2em;
 }
 
-#project-list li .project-description {
+#project-list li .project-description,
+#story-list li .story-description,
+#task-list li .task-description {
   margin-bottom: 0.5em;
 }
 
-#project-list li .buttons {
+#project-list li .buttons,
+#story-list li .buttons,
+#task-list li .buttons {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
