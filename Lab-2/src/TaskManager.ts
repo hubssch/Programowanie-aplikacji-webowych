@@ -124,6 +124,7 @@ class TaskManager {
                 const taskName = document.createElement("div");
                 const taskDescription = document.createElement("div");
                 const taskPriority = document.createElement("div");
+                const taskEstimatedTime = document.createElement("div")
                 const taskStatus = document.createElement("div");
                 const taskEditButton = document.createElement("button");
                 const taskDeleteButton = document.createElement("button");
@@ -131,11 +132,13 @@ class TaskManager {
                 taskName.classList.add("task-name");
                 taskDescription.classList.add("task-description");
                 taskPriority.classList.add("task-priority");
+                taskEstimatedTime.classList.add("task-estimated-time")
                 taskStatus.classList.add("task-status");
 
                 taskName.innerText = task.name;
                 taskDescription.innerText = task.description;
                 taskPriority.innerText = `Priority: ${task.priority}`;
+                taskEstimatedTime.innerText = `Estimated Time: ${task.estimatedTime}`
                 taskStatus.innerText = `Status: ${task.status}`;
                 taskEditButton.innerText = "Edit";
                 taskDeleteButton.innerText = "Delete";
@@ -156,6 +159,7 @@ class TaskManager {
                 taskInfo.appendChild(taskDescription);
                 taskInfo.appendChild(taskPriority);
                 taskInfo.appendChild(taskStatus);
+                taskInfo.appendChild(taskEstimatedTime)
                 buttonsDiv.appendChild(taskEditButton);
                 buttonsDiv.appendChild(taskDeleteButton);
 
